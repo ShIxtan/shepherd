@@ -18,6 +18,7 @@ paths = {
     'src/bower_components/phaser-official/build/phaser.min.js'
   ],
   js:     ['src/js/**/*.js'],
+  prefabs: ['src/js/prefabs/**/*.js'],
   dist:   './dist/'
 };
 

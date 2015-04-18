@@ -10,6 +10,8 @@
     create: function () {
       this.map = this.game.add.tilemap('tilemap');
       this.map.addTilesetImage('tiles', 'gameTiles');
+      this.timer = this.time.create();
+      this.timer.start();
 
       this.backgroundLayer = this.map.createLayer('backgroundLayer');
       this.blockedLayer = this.map.createLayer('blockedLayer');
@@ -28,18 +30,20 @@
 
       this.ghost = this.game.add.sprite(start.x, start.y, 'ghost');
       this.game.physics.arcade.enable(this.ghost);
+      this.ghost.enableBody = true;
+      this.ghost.body.collideWorldBounds = true
 
       //move player with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
     },
 
     createPriest: function() {
-      this.priests = this.priests || this.game.add.group()
-      this.game.physics.arcade.enable(this.priests);
+      this.priests = this.priests || this.game.add.group();
 
       var start = this.findObjectsByType('priestStart', this.map, 'objectLayer')[0];
+      var priest = new this.game.Priest(this.game, start.x, start.y, this.map);
 
-      this.priests.create(start.x, start.y, 'priest');
+      this.priests.add(priest);
     },
 
     createObject: function(name) {
@@ -52,21 +56,17 @@
       }, this);
     },
 
-    //find objects in a Tiled layer that containt a property called "type" equal to a certain value
     findObjectsByType: function(type, map, layer) {
-      var result = new Array();
+      var result = [];
       map.objects[layer].forEach(function(element){
         if(element.properties.type === type) {
-          //Phaser uses top left, Tiled bottom left so we have to adjust
-          //also keep in mind that the cup images are a bit smaller than the tile which is 16x16
-          //so they might not be placed in the exact position as in Tiled
           element.y -= map.tileHeight;
           result.push(element);
         }
       });
       return result;
     },
-    //create a sprite from an object
+
     createFromTiledObject: function(element, group) {
       var sprite = group.create(element.x, element.y, element.properties.sprite);
 
@@ -77,20 +77,25 @@
     },
 
     update: function () {
+      this.game.physics.arcade.collide(this.priests, this.blockedLayer);
+      this.moveGhost();
+    },
+
+    moveGhost: function() {
       this.ghost.body.velocity.y = 0;
       this.ghost.body.velocity.x = 0;
 
       if(this.cursors.up.isDown) {
-        this.ghost.body.velocity.y -= 50;
+        this.ghost.body.velocity.y -= 100;
       }
       else if(this.cursors.down.isDown) {
-        this.ghost.body.velocity.y += 50;
+        this.ghost.body.velocity.y += 100;
       }
       if(this.cursors.left.isDown) {
-        this.ghost.body.velocity.x -= 50;
+        this.ghost.body.velocity.x -= 100;
       }
       else if(this.cursors.right.isDown) {
-        this.ghost.body.velocity.x += 50;
+        this.ghost.body.velocity.x += 100;
       }
     }
   };
