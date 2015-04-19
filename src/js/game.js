@@ -33,7 +33,7 @@
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true;
 
-      //move player with cursor keys
+      //move ghost with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
     },
 
@@ -72,6 +72,8 @@
 
     createFromTiledObject: function(element, group) {
       var sprite = group.create(element.x, element.y, element.properties.sprite);
+      this.game.physics.arcade.enable(sprite);
+      sprite.enableBody = true;
 
         //copy all properties to the sprite
         Object.keys(element.properties).forEach(function(key){
@@ -82,6 +84,7 @@
     update: function () {
       this.game.physics.arcade.collide(this.priests, this.blockedLayer);
       this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this));
+      this.game.physics.arcade.overlap(this.priests, this.shepherd, this.gameOver.bind(this));
       this.moveGhost();
     },
 
@@ -97,6 +100,10 @@
       } else {
         priest.scare();
       }
+    },
+
+    gameOver: function() {
+      this.game.paused = true;
     },
 
     moveGhost: function() {
