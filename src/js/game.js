@@ -32,6 +32,7 @@
       this.game.physics.arcade.enable(this.ghost);
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true;
+      this.ghost.alpha = 0.5
 
       //move ghost with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -44,7 +45,7 @@
       var priest = new this.game.Priest(this.game, this.priestStart.x, this.priestStart.y, this.map);
 
       this.priests.add(priest);
-      if (this.priests.total < 10){
+      if (this.priests.countLiving() + this.priests.countDead() < 10){
         this.timer.add(Math.random()*10000, this.createPriest, this);
       }
     },
@@ -86,6 +87,10 @@
       this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this));
       this.game.physics.arcade.overlap(this.priests, this.shepherd, this.gameOver.bind(this));
       this.moveGhost();
+
+      if (this.priests.countDead() >= 10){
+        this.gameOver();
+      }
     },
 
     handleCollision: function(ghost, priest) {
