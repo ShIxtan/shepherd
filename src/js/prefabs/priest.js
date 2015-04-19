@@ -93,6 +93,10 @@
     this.heading = direction;
   };
 
+  Priest.prototype.scare = function(){
+    this.kill();
+  };
+
   window['shepherd'] = window['shepherd'] || {};
   window['shepherd'].Priest = Priest;
 }());
