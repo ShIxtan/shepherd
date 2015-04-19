@@ -24,6 +24,9 @@
       this.load.image('priest', 'assets/images/priest.png');
       this.load.image('door', 'assets/images/door.png');
       this.load.image('shepherd', 'assets/images/shepherd.png');
+      this.load.audio('music', 'assets/audio/music.mp3');
+      this.load.audio('exorcise', 'assets/audio/exorcise.wav');
+      this.load.audio('scare', 'assets/audio/scare.wav');
     },
 
     create: function () {

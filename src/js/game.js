@@ -8,6 +8,14 @@
   Game.prototype = {
 
     create: function () {
+      this.music = this.game.add.audio('music', 0.3, true);
+      this.music.override = true;
+
+      this.scare = this.game.add.audio('scare');
+      this.exorcise = this.game.add.audio('exorcise');
+
+      this.music.play();
+
       this.map = this.game.add.tilemap('tilemap');
       this.map.addTilesetImage('tiles', 'gameTiles');
       this.timer = this.time.create();
@@ -103,6 +111,9 @@
 
       if (((priest.heading === Phaser.UP) && priest.body.touching.down) || ((priest.heading === Phaser.DOWN) && priest.body.touching.up) || ((priest.heading === Phaser.LEFT) && priest.body.touching.right) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.left)) {
         priest.scare();
+        this.scare.play();
+      } else {
+        this.exorcise.play();
       }
     },
 
