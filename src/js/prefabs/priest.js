@@ -14,10 +14,11 @@
     this.speed = 80;
     this.turnSpeed = 150;
     this.anchor.set(0.5);
-    this.scared = false;
-    this.heading = Phaser.RIGHT;
     this.x += this.gridsize/2;
     this.y += this.gridsize/2;
+    this.scared = false;
+    this.heading = Phaser.RIGHT;
+
 
     game.physics.arcade.enable(this);
 
@@ -109,9 +110,11 @@
   };
 
   Priest.prototype.scare = function(){
-    this.scared = true;
-    this.speed = 160;
-    this.move(this.opposites[this.heading]);
+    if (!this.scared){
+      this.scared = true;
+      this.speed = 160;
+      this.move(this.opposites[this.heading]);
+    }
   };
 
   Priest.prototype.getAngle = function (to) {

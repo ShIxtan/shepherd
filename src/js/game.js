@@ -41,6 +41,9 @@
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true;
       this.ghost.alpha = 0.3;
+      this.ghost.anchor.set(0.5);
+      this.ghost.x += this.map.tileHeight/2;
+      this.ghost.y += this.map.tileHeight/2;
 
       //move ghost with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -109,11 +112,11 @@
         ghost.body.enable = true;
       })
 
-      if (((priest.heading === Phaser.UP) && priest.body.touching.down) || ((priest.heading === Phaser.DOWN) && priest.body.touching.up) || ((priest.heading === Phaser.LEFT) && priest.body.touching.right) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.left)) {
+      if (((priest.heading === Phaser.UP) && priest.body.touching.up) || ((priest.heading === Phaser.DOWN) && priest.body.touching.down) || ((priest.heading === Phaser.LEFT) && priest.body.touching.left) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.right)) {
+        this.exorcise.play();
+      } else {
         priest.scare();
         this.scare.play();
-      } else {
-        this.exorcise.play();
       }
     },
 
@@ -136,6 +139,9 @@
       }
       else if(this.cursors.right.isDown) {
         this.ghost.body.velocity.x += 100;
+      }
+      if (this.ghost.body.velocity.y || this.ghost.body.velocity.x) {
+        this.ghost.rotation = Math.atan2(this.ghost.body.velocity.y, this.ghost.body.velocity.x );
       }
     }
   };
