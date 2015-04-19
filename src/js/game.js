@@ -31,7 +31,7 @@
       this.ghost = this.game.add.sprite(this.ghostStart.x, this.ghostStart.y, 'ghost');
       this.game.physics.arcade.enable(this.ghost);
       this.ghost.enableBody = true;
-      this.ghost.body.collideWorldBounds = true
+      this.ghost.body.collideWorldBounds = true;
 
       //move player with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -45,7 +45,7 @@
 
       this.priests.add(priest);
       if (this.priests.total < 10){
-        this.timer.add(Math.random()*10000, this.createPriest, this)
+        this.timer.add(Math.random()*10000, this.createPriest, this);
       }
     },
 
@@ -81,17 +81,14 @@
 
     update: function () {
       this.game.physics.arcade.collide(this.priests, this.blockedLayer);
-      this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this))
+      this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this));
       this.moveGhost();
     },
 
     handleCollision: function(ghost, priest) {
-      if (((priest.heading === Phaser.UP) && priest.body.touching.up)
-          || ((priest.heading === Phaser.DOWN) && priest.body.touching.down)
-          || ((priest.heading === Phaser.LEFT) && priest.body.touching.left)
-          || ((priest.heading === Phaser.RIGHT) && priest.body.touching.right)) {
-            this.game.add.tween(this.ghost).to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
-          }
+      if (((priest.heading === Phaser.UP) && priest.body.touching.up) || ((priest.heading === Phaser.DOWN) && priest.body.touching.down) || ((priest.heading === Phaser.LEFT) && priest.body.touching.left) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.right)) {
+        this.game.add.tween(this.ghost).to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
+      }
     },
 
     moveGhost: function() {
