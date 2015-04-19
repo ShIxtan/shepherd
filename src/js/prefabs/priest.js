@@ -1,11 +1,13 @@
 (function(){
   'use strict';
 
-  var Priest = function(game, x, y, map) {
+  var Priest = function(game, x, y, map, target) {
     Phaser.Sprite.call(this, game, x, y, 'priest');
     this.map = map;
+    this.layer = this.map.getLayerIndex('blockedLayer');
     this.game = game;
     this.marker = new Phaser.Point();
+    this.target = new Phaser.Point();
     this.turnPoint = new Phaser.Point();
     this.turning = Phaser.NONE;
     this.directions = [];
@@ -17,37 +19,36 @@
     this.x += this.gridsize/2;
     this.y += this.gridsize/2;
     this.scared = false;
-    this.heading = Phaser.RIGHT;
+    this.marker.x = this.game.math.snapToFloor(Math.floor(this.x), this.gridsize) / this.gridsize;
+    this.marker.y = this.game.math.snapToFloor(Math.floor(this.y), this.gridsize) / this.gridsize;
+    this.target.x = this.game.math.snapToFloor(Math.floor(target.x), this.gridsize) / this.gridsize;
+    this.target.y = this.game.math.snapToFloor(Math.floor(target.y), this.gridsize) / this.gridsize;
+    this.path = this.findPath(this.marker.x, this.marker.y);
 
+    this.path_index = 1;
+    this.turning = this.path[1]
 
     game.physics.arcade.enable(this);
 
-    this.body.velocity.x = this.speed;
-    this.move(Phaser.RIGHT);
+    this.move(this.path[0])
   };
 
   Priest.prototype = Object.create(Phaser.Sprite.prototype);
   Priest.prototype.constructor = Priest;
 
   Priest.prototype.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
+  Priest.prototype.DIRS = [[0,0], [-1, 0], [1, 0], [0, -1], [0, 1]];
 
   Priest.prototype.update = function() {
     var x = this.marker.x = this.game.math.snapToFloor(Math.floor(this.x), this.gridsize) / this.gridsize;
     var y = this.marker.y = this.game.math.snapToFloor(Math.floor(this.y), this.gridsize) / this.gridsize;
 
-    var i = this.map.getLayerIndex('blockedLayer');
-
-    this.directions[Phaser.LEFT] = this.map.getTileLeft(i, x, y);
-    this.directions[Phaser.RIGHT] = this.map.getTileRight(i, x, y);
-    this.directions[Phaser.UP] = this.map.getTileAbove(i, x, y);
-    this.directions[Phaser.DOWN] = this.map.getTileBelow(i, x, y);
+    this.directions = this.getSurroundings(x, y)
 
     if (!this.directions[this.heading]){
       this.kill();
-    } else if (this.directions[this.heading].canCollide){
-      this.changeDirection();
     }
-    if (this.turning !== Phaser.NONE) {
+    if (!!this.turning){
       if (this.game.math.fuzzyEqual(this.x, this.turnPoint.x, 3) &&
           this.game.math.fuzzyEqual(this.y, this.turnPoint.y, 3)){
         this.x = this.turnPoint.x;
@@ -56,68 +57,45 @@
         this.body.reset(this.turnPoint.x, this.turnPoint.y);
 
         this.move(this.turning);
-
-        this.turning = Phaser.NONE;
+        this.path_index += this.scared ? -1 : 1;
+        this.turning = this.scared? this.opposites[this.path[this.path_index]] : this.path[this.path_index];
       }
-    }
-  };
-
-  Priest.prototype.changeDirection = function(){
-    if (this.scared){
-      if (this.checkDirection(Phaser.LEFT)){
-      } else if (this.checkDirection(Phaser.DOWN)){
-      } else if (this.checkDirection(Phaser.UP)){
-      } else {
-        this.checkDirection(Phaser.RIGHT);
-      }
-    } else {
-      if (this.checkDirection(Phaser.RIGHT)){
-      } else if (this.checkDirection(Phaser.UP)){
-      } else if (this.checkDirection(Phaser.DOWN)){
-      } else {
-        this.checkDirection(Phaser.LEFT);
-      }
-    }
-  };
-
-  Priest.prototype.checkDirection = function(turnTo){
-    if (this.directions[turnTo].canCollide){
-      return false;
-    } else {
-      this.turning = turnTo;
-
-      this.turnPoint.x = (this.marker.x * this.gridsize) + (this.gridsize / 2);
-      this.turnPoint.y = (this.marker.y * this.gridsize) + (this.gridsize / 2);
-      return true;
     }
   };
 
   Priest.prototype.move = function(direction){
-    var speed = this.speed;
+    if (direction){
+      var speed = this.speed;
 
-    if (direction === Phaser.LEFT || direction === Phaser.UP) {
-      speed = -speed;
+      if (direction === Phaser.LEFT || direction === Phaser.UP) {
+        speed = -speed;
+      }
+      if (direction === Phaser.LEFT || direction === Phaser.RIGHT) {
+        this.body.velocity.x = speed;
+      } else {
+        this.body.velocity.y = speed;
+      }
+
+      this.game.add.tween(this).to( { angle: this.getAngle(direction) }, this.turnSpeed, 'Linear', true);
+
+      this.heading = direction;
+      this.turnPoint.x = ((this.marker.x + this.DIRS[direction][0]) * this.gridsize) + (this.gridsize / 2);
+      this.turnPoint.y = ((this.marker.y + this.DIRS[direction][1]) * this.gridsize) + (this.gridsize / 2);
     }
-    if (direction === Phaser.LEFT || direction === Phaser.RIGHT) {
-      this.body.velocity.x = speed;
-    } else {
-      this.body.velocity.y = speed;
-    }
-
-    this.game.add.tween(this).to( { angle: this.getAngle(direction) }, this.turnSpeed, 'Linear', true);
-
-    this.heading = direction;
   };
 
   Priest.prototype.scare = function(){
     if (!this.scared){
       this.scared = true;
       this.speed = 160;
-      this.move(this.opposites[this.heading]);
+      this.path_index++;
     }
   };
 
   Priest.prototype.getAngle = function (to) {
+    if (this.heading === to){
+      return "0";
+    }
     if (this.heading === this.opposites[to]) {
         return "180";
     }
@@ -129,6 +107,39 @@
       return "-90";
     }
     return "90";
+  };
+
+  Priest.prototype.findPath = function(x, y, seen){
+    var seen = seen || {};
+
+    var surroundings = this.getSurroundings(x, y)
+
+    if (x === this.target.x && y === this.target.y){
+      return [0];
+    }
+
+    for (var i = 1; i < 5; i++) {
+      var tile = surroundings[i];
+      if (tile && !tile.canCollide && !seen[tile.x + " " + tile.y] ){
+        seen[x + " " + y] = true;
+        var path = this.findPath(tile.x, tile.y, seen);
+        if (path) {
+          return [i].concat(path);
+        }
+      }
+    }
+
+    return false;
+  };
+
+  Priest.prototype.getSurroundings = function(x, y) {
+    var dirs = []
+    dirs[Phaser.LEFT] = this.map.getTileLeft(this.layer, x, y);
+    dirs[Phaser.RIGHT] = this.map.getTileRight(this.layer, x, y);
+    dirs[Phaser.UP] = this.map.getTileAbove(this.layer, x, y);
+    dirs[Phaser.DOWN] = this.map.getTileBelow(this.layer, x, y);
+
+    return dirs;
   };
 
   window['shepherd'] = window['shepherd'] || {};

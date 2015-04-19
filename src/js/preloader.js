@@ -19,6 +19,7 @@
 
     loadResources: function () {
       this.load.tilemap('level1', 'assets/tilemaps/level1.json', null, Phaser.Tilemap.TILED_JSON);
+      this.load.tilemap('level2', 'assets/tilemaps/level2.json', null, Phaser.Tilemap.TILED_JSON);
       this.load.image('gameTiles', 'assets/images/tiles.png');
       this.load.image('ghost', 'assets/images/ghost.png');
       this.load.image('priest', 'assets/images/priest.png');
@@ -34,6 +35,9 @@
 
     update: function () {
       if (!!this.ready) {
+        this.music = this.add.audio('music', 0.3, true);
+        this.music.override = true;
+        this.music.play();
         this.game.state.start('level1');
       }
     },

@@ -1,22 +1,16 @@
 (function() {
   'use strict';
 
-  function Game() {
+  function Level() {
     this.player = null;
   }
 
-  Game.prototype = {
-
+  Level.prototype = {
     create: function () {
-      this.music = this.game.add.audio('music', 0.3, true);
-      this.music.override = true;
+      this.scare = this.add.audio('scare', 0.5);
+      this.exorcise = this.add.audio('exorcise', 0.5);
 
-      this.scare = this.game.add.audio('scare', 0.5);
-      this.exorcise = this.game.add.audio('exorcise', 0.5);
-
-      this.music.play();
-
-      this.map = this.game.add.tilemap(this.level);
+      this.map = this.add.tilemap(this.level);
       this.map.addTilesetImage('tiles', 'gameTiles');
       this.timer = this.time.create();
       this.timer.start();
@@ -27,6 +21,8 @@
       this.map.setCollisionBetween(1, 2000, true, 'blockedLayer');
 
       this.backgroundLayer.resizeWorld();
+
+      this.priests = this.add.group();
       this.createObject('door');
       this.createObject('shepherd');
       this.createGhost();
@@ -36,8 +32,8 @@
     createGhost: function() {
       this.ghostStart = this.findObjectsByType('ghostStart', this.map, 'objectLayer')[0];
 
-      this.ghost = this.game.add.sprite(this.ghostStart.x, this.ghostStart.y, 'ghost');
-      this.game.physics.arcade.enable(this.ghost);
+      this.ghost = this.add.sprite(this.ghostStart.x, this.ghostStart.y, 'ghost');
+      this.physics.arcade.enable(this.ghost);
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true;
       this.ghost.alpha = 0.3;
@@ -46,24 +42,22 @@
       this.ghost.y += this.map.tileHeight/2;
 
       //move ghost with cursor keys
-      this.cursors = this.game.input.keyboard.createCursorKeys();
+      this.cursors = this.input.keyboard.createCursorKeys();
     },
 
     createPriest: function() {
-      this.priests = this.priests || this.game.add.group();
-
       this.priestStart = this.priestStart || this.findObjectsByType('priestStart', this.map, 'objectLayer')[0];
-      var priest = new this.game.Priest(this.game, this.priestStart.x, this.priestStart.y, this.map);
+      var priest = new this.game.Priest(this, this.priestStart.x, this.priestStart.y, this.map, this.shepherd.children[0]);
 
       this.priests.add(priest);
-      if (this.priests.countLiving() + this.priests.countDead() < 10){
-        this.timer.add(Math.random()*5000, this.createPriest, this);
+      if (this.priests.countLiving() + this.priests.countDead() < this.priestCount){
+        this.timer.add(Math.random()*this.priestGen + 1000, this.createPriest, this);
       }
     },
 
     createObject: function(name) {
       //create items
-      this[name] = this.game.add.group();
+      this[name] = this.add.group();
 
       var result = this.findObjectsByType(name, this.map, 'objectLayer');
       result.forEach(function(element){
@@ -84,29 +78,29 @@
 
     createFromTiledObject: function(element, group) {
       var sprite = group.create(element.x, element.y, element.properties.sprite);
-      this.game.physics.arcade.enable(sprite);
+      this.physics.arcade.enable(sprite);
       sprite.enableBody = true;
 
-        //copy all properties to the sprite
-        Object.keys(element.properties).forEach(function(key){
-          sprite[key] = element.properties[key];
-        });
+      //copy all properties to the sprite
+      Object.keys(element.properties).forEach(function(key){
+        sprite[key] = element.properties[key];
+      });
     },
 
     update: function () {
-      this.game.physics.arcade.collide(this.priests, this.blockedLayer);
-      this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this));
-      this.game.physics.arcade.overlap(this.priests, this.shepherd, this.gameOver.bind(this));
+      this.physics.arcade.collide(this.priests, this.blockedLayer);
+      this.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this));
+      this.physics.arcade.overlap(this.priests, this.shepherd, this.lose.bind(this));
       this.moveGhost();
 
-      if (this.priests.countDead() >= 10){
-        this.gameOver();
+      if (this.priests.countDead() >= this.priestCount){
+        this.win();
       }
     },
 
     handleCollision: function(ghost, priest) {
       ghost.body.enable = false;
-      var tw = this.game.add.tween(ghost);
+      var tw = this.add.tween(ghost);
       tw.to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
       tw.onComplete.add(function(){
         ghost.body.enable = true;
@@ -120,8 +114,12 @@
       }
     },
 
-    gameOver: function() {
-      this.game.paused = true;
+    win: function() {
+      this.game.state.start(this.nextLevel);
+    },
+
+    lose: function() {
+      this.game.state.restart(true, false);
     },
 
     moveGhost: function() {
@@ -147,15 +145,30 @@
   };
 
   var Level1 = function() {
-    Game.call(this);
+    Level.call(this);
     this.level = 'level1';
+    this.nextLevel = 'level2';
+    this.priestCount = 10;
+    this.priestGen = 4000;
   };
 
-  Level1.prototype = Object.create(Game.prototype);
+  Level1.prototype = Object.create(Level.prototype);
   Level1.prototype.constructor = Level1;
 
+  var Level2 = function() {
+    Level.call(this);
+    this.level = 'level2';
+    this.nextLevel = 'level1';
+    this.priestCount = 10;
+    this.priestGen = 4000;
+  };
+
+  Level2.prototype = Object.create(Level.prototype);
+  Level2.prototype.constructor = Level2;
+
   window['shepherd'] = window['shepherd'] || {};
-  window['shepherd'].Game = Game;
+  window['shepherd'].Level = Level;
   window['shepherd'].Level1 = Level1;
+  window['shepherd'].Level2 = Level2;
 
 }());
