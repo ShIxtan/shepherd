@@ -158,7 +158,7 @@
   var Level2 = function() {
     Level.call(this);
     this.level = 'level2';
-    this.nextLevel = 'level1';
+    this.nextLevel = 'level3';
     this.priestCount = 10;
     this.priestGen = 4000;
   };
@@ -166,9 +166,21 @@
   Level2.prototype = Object.create(Level.prototype);
   Level2.prototype.constructor = Level2;
 
+  var Level3 = function() {
+    Level.call(this);
+    this.level = 'level3';
+    this.nextLevel = 'level1';
+    this.priestCount = 10;
+    this.priestGen = 4000;
+  };
+
+  Level3.prototype = Object.create(Level.prototype);
+  Level3.prototype.constructor = Level3;
+
   window['shepherd'] = window['shepherd'] || {};
   window['shepherd'].Level = Level;
   window['shepherd'].Level1 = Level1;
   window['shepherd'].Level2 = Level2;
+  window['shepherd'].Level3 = Level3;
 
 }());

@@ -1,6 +1,16 @@
 (function(){
   'use strict';
 
+  function shuffle(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+  }
+
   var Priest = function(game, x, y, map, target) {
     Phaser.Sprite.call(this, game, x, y, 'priest');
     this.map = map;
@@ -118,13 +128,15 @@
       return [0];
     }
 
-    for (var i = 1; i < 5; i++) {
-      var tile = surroundings[i];
+    var dirs = shuffle([1,2,3,4]);
+
+    for (var i = 0; i < 4; i++) {
+      var tile = surroundings[dirs[i]];
       if (tile && !tile.canCollide && !seen[tile.x + " " + tile.y] ){
         seen[x + " " + y] = true;
         var path = this.findPath(tile.x, tile.y, seen);
         if (path) {
-          return [i].concat(path);
+          return [dirs[i]].concat(path);
         }
       }
     }

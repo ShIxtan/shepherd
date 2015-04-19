@@ -9,6 +9,7 @@ window.onload = function () {
   game.state.add('menu', ns.Menu);
   game.state.add('level1', ns.Level1);
   game.state.add('level2', ns.Level2);
+  game.state.add('level3', ns.Level3);
 
   /* yo phaser:state new-state-files-put-here */
 
