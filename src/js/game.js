@@ -26,9 +26,9 @@
     },
 
     createGhost: function() {
-      var start = this.findObjectsByType('ghostStart', this.map, 'objectLayer')[0];
+      this.ghostStart = this.findObjectsByType('ghostStart', this.map, 'objectLayer')[0];
 
-      this.ghost = this.game.add.sprite(start.x, start.y, 'ghost');
+      this.ghost = this.game.add.sprite(this.ghostStart.x, this.ghostStart.y, 'ghost');
       this.game.physics.arcade.enable(this.ghost);
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true
@@ -40,10 +40,13 @@
     createPriest: function() {
       this.priests = this.priests || this.game.add.group();
 
-      var start = this.findObjectsByType('priestStart', this.map, 'objectLayer')[0];
-      var priest = new this.game.Priest(this.game, start.x, start.y, this.map);
+      this.priestStart = this.priestStart || this.findObjectsByType('priestStart', this.map, 'objectLayer')[0];
+      var priest = new this.game.Priest(this.game, this.priestStart.x, this.priestStart.y, this.map);
 
       this.priests.add(priest);
+      if (this.priests.total < 10){
+        this.timer.add(Math.random()*10000, this.createPriest, this)
+      }
     },
 
     createObject: function(name) {
@@ -78,7 +81,17 @@
 
     update: function () {
       this.game.physics.arcade.collide(this.priests, this.blockedLayer);
+      this.game.physics.arcade.overlap(this.priests, this.ghost, this.handleCollision.bind(this))
       this.moveGhost();
+    },
+
+    handleCollision: function(ghost, priest) {
+      if (((priest.heading === Phaser.UP) && priest.body.touching.up)
+          || ((priest.heading === Phaser.DOWN) && priest.body.touching.down)
+          || ((priest.heading === Phaser.LEFT) && priest.body.touching.left)
+          || ((priest.heading === Phaser.RIGHT) && priest.body.touching.right)) {
+            this.game.add.tween(this.ghost).to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
+          }
     },
 
     moveGhost: function() {
