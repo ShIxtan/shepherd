@@ -12,7 +12,7 @@
     this.enableBody = true;
     this.gridsize = map.tileHeight;
     this.speed = 80;
-    this.turnSpeed = 3;
+    this.turnSpeed = 150;
     this.anchor.set(0.5);
     this.scared = false;
     this.heading = Phaser.RIGHT;
