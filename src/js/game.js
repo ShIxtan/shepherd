@@ -16,7 +16,7 @@
 
       this.music.play();
 
-      this.map = this.game.add.tilemap('tilemap');
+      this.map = this.game.add.tilemap(this.level);
       this.map.addTilesetImage('tiles', 'gameTiles');
       this.timer = this.time.create();
       this.timer.start();
@@ -57,7 +57,7 @@
 
       this.priests.add(priest);
       if (this.priests.countLiving() + this.priests.countDead() < 10){
-        this.timer.add(Math.random()*10000, this.createPriest, this);
+        this.timer.add(Math.random()*5000, this.createPriest, this);
       }
     },
 
@@ -146,7 +146,16 @@
     }
   };
 
+  var Level1 = function() {
+    Game.call(this);
+    this.level = 'level1';
+  };
+
+  Level1.prototype = Object.create(Game.prototype);
+  Level1.prototype.constructor = Level1;
+
   window['shepherd'] = window['shepherd'] || {};
   window['shepherd'].Game = Game;
+  window['shepherd'].Level1 = Level1;
 
 }());
