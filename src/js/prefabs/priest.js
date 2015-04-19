@@ -14,6 +14,7 @@
     this.speed = 80;
     this.turnSpeed = 10;
     this.anchor.set(0.5);
+    this.scared = false;
     this.x += this.gridsize/2;
     this.y += this.gridsize/2;
 
@@ -21,6 +22,8 @@
 
     this.body.velocity.y = -this.speed;
     this.move(Phaser.UP);
+
+    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
   };
 
   Priest.prototype = Object.create(Phaser.Sprite.prototype);
@@ -37,7 +40,9 @@
     this.directions[Phaser.UP] = this.map.getTileAbove(i, x, y);
     this.directions[Phaser.DOWN] = this.map.getTileBelow(i, x, y);
 
-    if (this.directions[this.heading].canCollide){
+    if (!this.directions[this.heading]){
+      this.kill();
+    } else if (this.directions[this.heading].canCollide){
       this.changeDirection();
     }
     if (this.turning !== Phaser.NONE) {
@@ -56,11 +61,20 @@
   };
 
   Priest.prototype.changeDirection = function(){
-    if (this.checkDirection(Phaser.RIGHT)){
-    } else if (this.checkDirection(Phaser.UP)){
-    } else if (this.checkDirection(Phaser.DOWN)){
+    if (this.scared){
+      if (this.checkDirection(Phaser.LEFT)){
+      } else if (this.checkDirection(Phaser.DOWN)){
+      } else if (this.checkDirection(Phaser.UP)){
+      } else {
+        this.checkDirection(Phaser.RIGHT);
+      }
     } else {
-      this.checkDirection(Phaser.LEFT);
+      if (this.checkDirection(Phaser.RIGHT)){
+      } else if (this.checkDirection(Phaser.UP)){
+      } else if (this.checkDirection(Phaser.DOWN)){
+      } else {
+        this.checkDirection(Phaser.LEFT);
+      }
     }
   };
 
@@ -94,7 +108,9 @@
   };
 
   Priest.prototype.scare = function(){
-    this.kill();
+    this.scared = true;
+    this.speed = 160;
+    this.move(this.opposites[this.heading]);
   };
 
   window['shepherd'] = window['shepherd'] || {};

@@ -32,7 +32,7 @@
       this.game.physics.arcade.enable(this.ghost);
       this.ghost.enableBody = true;
       this.ghost.body.collideWorldBounds = true;
-      this.ghost.alpha = 0.5
+      this.ghost.alpha = 0.3;
 
       //move ghost with cursor keys
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -94,15 +94,14 @@
     },
 
     handleCollision: function(ghost, priest) {
+      ghost.body.enable = false;
+      var tw = this.game.add.tween(ghost);
+      tw.to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
+      tw.onComplete.add(function(){
+        ghost.body.enable = true;
+      })
 
-      if (((priest.heading === Phaser.UP) && priest.body.touching.up) || ((priest.heading === Phaser.DOWN) && priest.body.touching.down) || ((priest.heading === Phaser.LEFT) && priest.body.touching.left) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.right)) {
-        ghost.body.enable = false;
-        var tw = this.game.add.tween(ghost);
-        tw.to( { x: this.ghostStart.x, y: this.ghostStart.y }, 300, 'Linear', true);
-        tw.onComplete.add(function(){
-          ghost.body.enable = true;
-        })
-      } else {
+      if (((priest.heading === Phaser.UP) && priest.body.touching.down) || ((priest.heading === Phaser.DOWN) && priest.body.touching.up) || ((priest.heading === Phaser.LEFT) && priest.body.touching.right) || ((priest.heading === Phaser.RIGHT) && priest.body.touching.left)) {
         priest.scare();
       }
     },
