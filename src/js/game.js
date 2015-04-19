@@ -11,8 +11,8 @@
       this.music = this.game.add.audio('music', 0.3, true);
       this.music.override = true;
 
-      this.scare = this.game.add.audio('scare');
-      this.exorcise = this.game.add.audio('exorcise');
+      this.scare = this.game.add.audio('scare', 0.5);
+      this.exorcise = this.game.add.audio('exorcise', 0.5);
 
       this.music.play();
 

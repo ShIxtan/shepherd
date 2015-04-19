@@ -12,22 +12,23 @@
     this.enableBody = true;
     this.gridsize = map.tileHeight;
     this.speed = 80;
-    this.turnSpeed = 10;
+    this.turnSpeed = 3;
     this.anchor.set(0.5);
     this.scared = false;
+    this.heading = Phaser.RIGHT;
     this.x += this.gridsize/2;
     this.y += this.gridsize/2;
 
     game.physics.arcade.enable(this);
 
-    this.body.velocity.y = -this.speed;
-    this.move(Phaser.UP);
-
-    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
+    this.body.velocity.x = this.speed;
+    this.move(Phaser.RIGHT);
   };
 
   Priest.prototype = Object.create(Phaser.Sprite.prototype);
   Priest.prototype.constructor = Priest;
+
+  Priest.prototype.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
 
   Priest.prototype.update = function() {
     var x = this.marker.x = this.game.math.snapToFloor(Math.floor(this.x), this.gridsize) / this.gridsize;
@@ -102,7 +103,7 @@
       this.body.velocity.y = speed;
     }
 
-    //this.game.add.tween(this).to( { angle: this.getAngle(direction) }, this.turnSpeed, 'Linear', true);
+    this.game.add.tween(this).to( { angle: this.getAngle(direction) }, this.turnSpeed, 'Linear', true);
 
     this.heading = direction;
   };
@@ -111,6 +112,20 @@
     this.scared = true;
     this.speed = 160;
     this.move(this.opposites[this.heading]);
+  };
+
+  Priest.prototype.getAngle = function (to) {
+    if (this.heading === this.opposites[to]) {
+        return "180";
+    }
+
+    if ((this.heading === Phaser.UP && to === Phaser.LEFT) ||
+        (this.heading === Phaser.DOWN && to === Phaser.RIGHT) ||
+        (this.heading === Phaser.LEFT && to === Phaser.DOWN) ||
+        (this.heading === Phaser.RIGHT && to === Phaser.UP)) {
+      return "-90";
+    }
+    return "90";
   };
 
   window['shepherd'] = window['shepherd'] || {};
