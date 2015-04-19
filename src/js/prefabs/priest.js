@@ -40,7 +40,7 @@
 
     game.physics.arcade.enable(this);
 
-    this.move(this.path[0])
+    this.move(this.path[0]);
   };
 
   Priest.prototype = Object.create(Phaser.Sprite.prototype);
@@ -121,7 +121,6 @@
 
   Priest.prototype.findPath = function(x, y, seen){
     var seen = seen || {};
-
     var surroundings = this.getSurroundings(x, y)
 
     if (x === this.target.x && y === this.target.y){

@@ -10,6 +10,8 @@ window.onload = function () {
   game.state.add('level1', ns.Level1);
   game.state.add('level2', ns.Level2);
   game.state.add('level3', ns.Level3);
+  game.state.add('level4', ns.Level4);
+  game.state.add('level5', ns.Level5);
 
   /* yo phaser:state new-state-files-put-here */
 

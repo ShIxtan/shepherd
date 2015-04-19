@@ -46,10 +46,16 @@
     },
 
     createPriest: function() {
-      this.priestStart = this.priestStart || this.findObjectsByType('priestStart', this.map, 'objectLayer')[0];
-      var priest = new this.game.Priest(this, this.priestStart.x, this.priestStart.y, this.map, this.shepherd.children[0]);
+      this.starts = this.starts || this.findObjectsByType('priestStart', this.map, 'objectLayer');
+      var start = this.starts[Math.floor(Math.random() * this.starts.length)];
+      var priest = new this.game.Priest(this, start.x, start.y, this.map, this.shepherd.children[0]);
 
       this.priests.add(priest);
+
+      // if (start.properties.rot) {
+      //   console.log (start.properties.rot);
+      //   this.add.tween(priest).to( { angle: start.properties.rot }, 100, 'Linear', true);
+      // }
       if (this.priests.countLiving() + this.priests.countDead() < this.priestCount){
         this.timer.add(Math.random()*this.priestGen + 1000, this.createPriest, this);
       }
@@ -158,7 +164,7 @@
   var Level2 = function() {
     Level.call(this);
     this.level = 'level2';
-    this.nextLevel = 'level3';
+    this.nextLevel = 'level4';
     this.priestCount = 10;
     this.priestGen = 4000;
   };
@@ -177,10 +183,34 @@
   Level3.prototype = Object.create(Level.prototype);
   Level3.prototype.constructor = Level3;
 
+  var Level4 = function() {
+    Level.call(this);
+    this.level = 'level4';
+    this.nextLevel = 'level3';
+    this.priestCount = 10;
+    this.priestGen = 4000;
+  };
+
+  Level4.prototype = Object.create(Level.prototype);
+  Level4.prototype.constructor = Level4;
+
+  var Level5 = function() {
+    Level.call(this);
+    this.level = 'level5';
+    this.nextLevel = 'level3';
+    this.priestCount = 10;
+    this.priestGen = 4000;
+  };
+
+  Level5.prototype = Object.create(Level.prototype);
+  Level5.prototype.constructor = Level5;
+
   window['shepherd'] = window['shepherd'] || {};
   window['shepherd'].Level = Level;
   window['shepherd'].Level1 = Level1;
   window['shepherd'].Level2 = Level2;
   window['shepherd'].Level3 = Level3;
+  window['shepherd'].Level4 = Level4;
+  window['shepherd'].Level5 = Level5;
 
 }());
