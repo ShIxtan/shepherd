@@ -4,9 +4,7 @@
   "readme": "",
   "repository": "",
   "version": "0.0.0",
-  "dependencies": {},
-
-  "devDependencies": {
+  "dependencies": {
     "bower": "*",
     "gulp": "*",
     "gulp-util": "*",
@@ -25,6 +23,8 @@
   },
 
   "scripts": {
+    "start": "node app",
+    "postinstall": "gulp default",
     "post-install": "node ./node_modules/bower/bin/bower install",
     "start": "node ./node_modules/gulp/bin/gulp.js",
 
