@@ -7,17 +7,23 @@
   }
 
   Menu.prototype = {
+    init: function(nextLevel){
+      this.nextLevel = nextLevel;
+    },
 
     create: function () {
+      var background = this.add.sprite(0, 0, "title");
 
+      this.input.keyboard.onDownCallback = this.onDown.bind(this);
     },
 
     update: function () {
 
     },
 
-    onDown: function () {
-      this.game.state.start('game');
+    onDown: function (e) {
+      this.game.state.start(this.nextLevel);
+      this.input.keyboard.onDownCallback = null;
     }
   };
 

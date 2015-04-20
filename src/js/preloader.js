@@ -28,6 +28,7 @@
       this.load.image('priest', 'assets/images/priest.png');
       this.load.image('door', 'assets/images/door.png');
       this.load.image('shepherd', 'assets/images/shepherd.png');
+      this.load.image('title', 'assets/images/title.png');
       this.load.audio('music', 'assets/audio/music.mp3');
       this.load.audio('exorcise', 'assets/audio/exorcise.wav');
       this.load.audio('scare', 'assets/audio/scare.wav');
@@ -41,7 +42,7 @@
         this.music = this.add.audio('music', 0.3, true);
         this.music.override = true;
         this.music.play();
-        this.game.state.start('level1');
+        this.game.state.start('menu', true, false, 'level1');
       }
     },
 
